@@ -8,16 +8,16 @@ import (
 )
 
 
-
+var port = "8080"
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
 		render(w, "test.page.gohtml")
 	})
 
-	fmt.Println("starting frontend service on port 80")
+	fmt.Println("starting frontend service on port ", port)
 
-	err := http.ListenAndServe(":80", nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -27,7 +27,6 @@ func render(w http.ResponseWriter, page string) {
 	partials := []string{
 		"./cmd/web/templates/base.layout.gohtml",
 		"./cmd/web/templates/header.partial.gohtml",
-		"./cmd/web/templates/footer.partial.gohtml",
 	}
 
 	var tempateSlice []string 
