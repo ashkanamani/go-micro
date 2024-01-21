@@ -8,7 +8,7 @@ import (
 )
 
 
-var port = "8000"
+var port = "80"
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
