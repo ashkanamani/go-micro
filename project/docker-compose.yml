@@ -7,7 +7,40 @@ services:
       dockerfile: ./../broker-service/broker-service.dockerfile
     restart: always
     ports:
-      - "8080:8080"
+      - "8080:80"
     deploy:
-      mode: replicate
+      mode: replicated
       replicas: 1
+
+
+  authentication:
+    build: 
+      context: ./../authentication-service/
+      dockerfile: ./../authentication-service/authentication-service.dockerfile
+    restart: always
+    ports:
+      - "8081:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: "host=postgres port=5432 user=postgres password=postgres dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+
+
+  postgres:
+    image: 'postgres:16.1'
+    ports:
+      - "5432:5432"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: gomicro-users
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
+
+
+      
