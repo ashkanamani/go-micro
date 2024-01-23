@@ -76,7 +76,7 @@ func connectToDB() *sql.DB {
 		}
 
 		if counts > 10 {
-			log.Println()
+			log.Println(err)
 			return nil
 		}
 		log.Println("backing off for 2 seconds...")

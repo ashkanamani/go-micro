@@ -18,7 +18,7 @@ type AuthPayload struct {
 }
 
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
-	payload := jsonResponse{
+	payload := jsonResponse {
 		Error:   false,
 		Message: "Hit the broker",
 	}
@@ -34,7 +34,6 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.errorJSON(w, err)
 		return
 	}
-
 	switch requestPayload.Action {
 	case "auth":
 		app.authentication(w, requestPayload.Auth)
