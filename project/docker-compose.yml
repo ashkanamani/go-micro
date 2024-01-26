@@ -24,7 +24,7 @@ services:
       mode: replicated
       replicas: 1
     environment:
-      DSN: "host=postgres port=5433 user=postgres password=postgres dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+      DSN: "host=root port=5433 user=postgres password=postgres dbname=gomicro-users sslmode=disable timezone=UTC connect_timeout=5"
 
 
   postgres:
@@ -42,5 +42,3 @@ services:
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
 
-
-      
