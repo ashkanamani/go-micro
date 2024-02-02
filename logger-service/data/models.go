@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -33,10 +34,10 @@ type LogEntry struct {
 
 func (l *LogEntry) Insert(enrty LogEntry) error {
 	collection := client.Database("logs").Collection("logs")
-	
+
 	_, err := collection.InsertOne(context.TODO(), LogEntry{
-		Name: enrty.Name,
-		Data: enrty.Data,
+		Name:      enrty.Name,
+		Data:      enrty.Data,
 		CreatedAt: enrty.CreatedAt,
 		UpdatedAt: enrty.UpdatedAt,
 	})
@@ -47,9 +48,8 @@ func (l *LogEntry) Insert(enrty LogEntry) error {
 	return nil
 }
 
-
 func (l *LogEntry) All() ([]*LogEntry, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 20 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
 	collection := client.Database("logs").Collection("logs")
@@ -73,10 +73,70 @@ func (l *LogEntry) All() ([]*LogEntry, error) {
 		err := cursor.Decode(&item)
 		if err != nil {
 			log.Println("error decoding log into slice:", err)
-			return nil, err 
+			return nil, err
 		}
 		logs = append(logs, &item)
 	}
 	return logs, nil
 
+}
+
+func (l *LogEntry) GetOne(id string) (*LogEntry, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	collection := client.Database("logs").Collection("logs")
+
+	docID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var enrty *LogEntry
+
+	err = collection.FindOne(ctx, bson.M{"_id": docID}).Decode(&enrty)
+	if err != nil {
+		return nil, err
+	}
+	return enrty, nil
+
+}
+
+func (l *LogEntry) DropCollection() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	collection := client.Database("logs").Collection("logs")
+
+	if err := collection.Drop(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (l *LogEntry) Update() (*mongo.UpdateResult, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	collection := client.Database("logs").Collection("logs")
+
+	docID, err := primitive.ObjectIDFromHex(l.ID)
+	if err != nil {
+		return nil, err
+	}
+	res, err := collection.UpdateOne(
+		ctx,
+		bson.M{"_id": docID},
+		bson.D{
+			{"$set", bson.D{
+				{"name", l.Name},
+				{"data", l.Data},
+				{"updated_at", time.Now()},
+			}},
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
