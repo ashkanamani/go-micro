@@ -11,6 +11,14 @@ type RequestPayload struct {
 	Action string      `json:"action"`
 	Auth   AuthPayload `json:"auth,omitempty"`
 	Log    LogPayload  `json:"log,omitempty"`
+	Mail   MailPayload `json:"mail,omitempty"`
+}
+
+type MailPayload struct {
+	From    string `json:"from"`
+	To      string `json:"to"`
+	Subject string `json:"subject"`
+	Message string `json:"message"`
 }
 
 type AuthPayload struct {
@@ -45,19 +53,23 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.authentication(w, requestPayload.Auth)
 	case "log":
 		app.logItem(w, requestPayload.Log)
+
+	case "mail":
+		app.SendMail(w, requestPayload.Mail)
 	default:
 		app.errorJSON(w, errors.New("unknown action"))
 	}
 }
-func (app *Config) logItem(w http.ResponseWriter, l LogPayload) { 
-	jsonData, _ := json.MarshalIndent(l, "", "\t")
 
-	logServiceURL := "http://logger-service/log"
+func (app *Config) SendMail(w http.ResponseWriter, msg MailPayload) {
+	jsonData, _ := json.MarshalIndent(msg, "", "\t")
 
-	req, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
+	mailServiceURL := "http://mailer-service/send"
+
+	req, err := http.NewRequest("POST", mailServiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		app.errorJSON(w, err)
-		return 
+		return
 	}
 	req.Header.Set("Content-Type", "application/json")
 
@@ -66,7 +78,39 @@ func (app *Config) logItem(w http.ResponseWriter, l LogPayload) {
 	resp, err := client.Do(req)
 	if err != nil {
 		app.errorJSON(w, err)
-		return 
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusAccepted {
+		app.errorJSON(w, err)
+		return
+	}
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "Message sent to " + msg.To
+
+	app.writeJSON(w, http.StatusAccepted, payload)
+
+}
+func (app *Config) logItem(w http.ResponseWriter, l LogPayload) {
+	jsonData, _ := json.MarshalIndent(l, "", "\t")
+
+	logServiceURL := "http://logger-service/log"
+
+	req, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
 	}
 	defer resp.Body.Close()
 
