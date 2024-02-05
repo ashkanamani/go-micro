@@ -77,7 +77,7 @@ services:
       mode: replicated
       replicas: 1
     environment:
-      MAIL_DOMAIL: localhost
+      MAIL_DOMAIN: localhost
       MAIL_HOST: mailhog
       MAIL_PORT: 1025
       MAIL_ENCRYPTION: none
