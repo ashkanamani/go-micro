@@ -32,7 +32,6 @@ func (app *Config) WriteLog(w http.ResponseWriter, r *http.Request) {
 		Error: false,
 		Message: "logged",
 	}
-
 	app.writeJSON(w, http.StatusAccepted, resp)
 }
 

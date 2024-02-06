@@ -4,19 +4,20 @@ import (
 	"authentication/data"
 	"database/sql"
 	"fmt"
+	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
 	"time"
-	_ "github.com/lib/pq"
 )
 
 const webPort = "80"
+const connectToDBAttempt = 10
 
 var counts int64
 
 type Config struct {
-	DB *sql.DB
+	DB     *sql.DB
 	Models data.Models
 }
 
@@ -29,14 +30,13 @@ func main() {
 		log.Panic("can't connect to postgresql!")
 	}
 
-
 	app := Config{
-		DB: conn,
+		DB:     conn,
 		Models: data.New(conn),
 	}
 
 	srv := &http.Server{
-		Addr: fmt.Sprintf(":%s", webPort),
+		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
 	}
 	err := srv.ListenAndServe()
@@ -45,7 +45,6 @@ func main() {
 	}
 
 }
-
 func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
@@ -53,11 +52,10 @@ func openDB(dsn string) (*sql.DB, error) {
 	}
 
 	err = db.Ping()
-
 	if err != nil {
 		return nil, err
-
 	}
+
 	return db, nil
 }
 
@@ -66,19 +64,20 @@ func connectToDB() *sql.DB {
 	for {
 		connection, err := openDB(dsn)
 		if err != nil {
-			log.Println("postgresql is not yet ready...")
-			log.Println(err)
+			log.Println("Postgres not yet ready ...")
 			counts++
 		} else {
-			log.Println("connected to postgresql")
+			log.Println("Connected to Postgres!")
 			return connection
 		}
 
-		if counts > 100 {
+		if counts > connectToDBAttempt {
 			log.Println(err)
 			return nil
 		}
-		log.Println("backing off for 2 seconds...")
+
+		log.Println("Backing off for two seconds....")
 		time.Sleep(2 * time.Second)
+		continue
 	}
 }

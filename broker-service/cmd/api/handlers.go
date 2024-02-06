@@ -53,7 +53,6 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.authentication(w, requestPayload.Auth)
 	case "log":
 		app.logItem(w, requestPayload.Log)
-
 	case "mail":
 		app.SendMail(w, requestPayload.Mail)
 	default:
@@ -95,18 +94,16 @@ func (app *Config) SendMail(w http.ResponseWriter, msg MailPayload) {
 }
 func (app *Config) logItem(w http.ResponseWriter, l LogPayload) {
 	jsonData, _ := json.MarshalIndent(l, "", "\t")
-
 	logServiceURL := "http://logger-service/log"
-
 	req, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
-
+	
 	client := &http.Client{}
-
+	
 	resp, err := client.Do(req)
 	if err != nil {
 		app.errorJSON(w, err)

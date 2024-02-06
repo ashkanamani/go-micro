@@ -53,8 +53,8 @@
                 from: "arshia@mail.com",
                 to: "nila@mail.com",
                 subject: "testing mail service",
-                message: "Hello World!!",
-            },
+                message: "Hello World!!"
+            }
         }
 
         const headers = new Headers();
@@ -82,18 +82,12 @@
             })
     })
 
-
-
-
-
-
-
     logBtn.addEventListener("click", function () {
-        const paload = {
+        const payload = {
             action: "log",
             log: {
                 name: "event",
-                data: "some kind of data to be saved",
+                data: "some kind of data to be saved"
             }
         }
         const headers = new Headers();
@@ -127,8 +121,8 @@
             action: "auth",
             auth: {
                 email: "ashkan@mail.com",
-                password: "verysecret!",
-            },
+                password: "verysecret"
+            }
         }
 
         const headers = new Headers();

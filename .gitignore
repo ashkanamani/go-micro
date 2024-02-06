@@ -3,4 +3,6 @@ workspace.code-workspace
 front-end/frontApp
 broker-service/brokerApp
 authentication-service/authApp
+logger-service/loggerApp
 project/db-data/
+mailer-service/mailerApp
