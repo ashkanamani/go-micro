@@ -85,6 +85,15 @@ services:
       FROM_NAME: "ashkan amani"
       FROM_ADDRESS: "ashkanamani@mail.com"
 
+  listener-service:
+    build:
+      context: ./../listener-service
+      dockerfile: ./../listener-service/listener-service.dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+
   rabbitmq:
     image: 'rabbitmq:3.12-alpine'
     ports:
