@@ -50,7 +50,6 @@ func (consumer *Consumer) Listen(topics []string) error {
 	if err != nil {
 		return err
 	}
-
 	for _, topic := range topics {
 		err = ch.QueueBind(
 			q.Name,

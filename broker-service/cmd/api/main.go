@@ -18,7 +18,7 @@ type Config struct {
 
 func main() {
 
-	// try to connect to rabbitmqr
+	// try to connect to rabbitMQ
 	rabbitConn, err := connect()
 	if err != nil {
 		log.Println(err)

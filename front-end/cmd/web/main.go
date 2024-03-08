@@ -29,13 +29,13 @@ func render(w http.ResponseWriter, page string) {
 		"./cmd/web/templates/header.partial.gohtml",
 	}
 
-	var tempateSlice []string 
+	var templateSlice []string 
 
-	tempateSlice = append(tempateSlice, fmt.Sprintf("./cmd/web/templates/%s", page))
+	templateSlice = append(templateSlice, fmt.Sprintf("./cmd/web/templates/%s", page))
 	
-	tempateSlice = append(tempateSlice, partials...)
+	templateSlice = append(templateSlice, partials...)
 
-	tmpl, err := template.ParseFiles(tempateSlice...)
+	tmpl, err := template.ParseFiles(templateSlice...)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
